@@ -84,7 +84,7 @@ int main(int argc, char **argv){
     double input[] = {0.5, 0.8};
     // Ausgang berechnen
     net.forward(input);
-    std::cout << net.layers[2].neurons[0].output;
+    std::cout << net.layers[sizeof(layer_struct)/sizeof(int)-1].neurons[0].output;
 
  return 0;   
 }
