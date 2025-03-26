@@ -78,14 +78,47 @@ class NeuronNet {
     }
 };
 
-int main(int argc, char **argv){
-    int layer_struct[] = {2, 3, 1};  // Struktur des Netzwerkes festlegen
-    NeuronNet net(layer_struct, sizeof(layer_struct)/sizeof(int)); // net instanzieren
-    double input[] = {0.5, 0.8};
-    // Ausgang berechnen
-    net.forward(input);
-    std::cout << net.layers[sizeof(layer_struct)/sizeof(int)-1].neurons[0].output;
+int main() {
+    // Netzwerkstruktur
+    int layer_struc[] = {2, 3, 5, 1};
+    NeuronNet net(layer_struc, sizeof(layer_struc) / sizeof(int));
 
- return 0;   
-}
+    // UND-Trainingsdaten
+    double inputs[4][2] = {
+        {0, 0},
+        {0, 1},
+        {1, 0},
+        {1, 1}
+    };
 
+    double targets[4][1] = {
+        {0},
+        {0},
+        {1},
+        {0}
+    };
+
+    double learning_rate = 0.5;
+    int epochs = 5000;
+
+    // Training
+    for (int epoch = 0; epoch < epochs; ++epoch) {
+        double total_error = 0.0;
+        for (int i = 0; i < 4; ++i) {
+            net.train(inputs[i], targets[i], learning_rate);
+            net.forward(inputs[i]);
+            double error = pow(targets[i][0] - net.layers[net.numLayers - 1].neurons[0].output, 2);
+            total_error += error;
+        }
+        if (epoch % 500 == 0) {
+            std::cout << "Epoche " << epoch << " - Fehler: " << total_error / 4.0 << std::endl;
+        }
+    }
+
+    // Testen
+    std::cout << "\nTrainiertes Netz:\n";
+    for (int i = 0; i < 4; ++i) {
+        net.forward(inputs[i]);
+        std::cout << "Eingang: " << inputs[i][0] << ", " << inputs[i][1]
+                  << " -> Ausgabe: " << net.layers[net.numLayers - 1].neurons[0].output << std::endl;
+    }
